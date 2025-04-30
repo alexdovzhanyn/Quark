@@ -70,7 +70,12 @@ void QuarkServer::run() {
 
     int incomingSocketDescriptor = accept(socketDescriptor, reinterpret_cast<sockaddr*>(&incomingAddr), &addr_size);
 
-    
+    if (incomingSocketDescriptor > 0) {
+      shared_ptr<ConnectionHandler> handler = make_shared<ConnectionHandler>(incomingSocketDescriptor, incomingAddr);
+
+      thread handlerThread(&ConnectionHandler::attendConnection, handler);
+      handlerThread.detach();
+    } 
   }
 }
 
