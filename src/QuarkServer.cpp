@@ -60,7 +60,7 @@ void QuarkServer::run() {
   }
 
   if (!startupSuccess) {
-    cout << "Listening for connections at " << serverAddress << ":" << port << " [" << ipVersion << "]" << endl; 
+    cout << "Listening for connections at " << serverAddress << ":" << port << " [" << ipVersion << "]" << endl << endl; 
     startupSuccess = true;
   }
 
