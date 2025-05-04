@@ -1,4 +1,5 @@
 #include "HttpRequestParser.hpp"
+#include "HttpRequestValidator.hpp"
 #include <string>
 #include <sys/socket.h>
 #include <unordered_set>
@@ -15,15 +16,12 @@ bool HttpRequestParser::parseIncomingRequest() {
     isRealRequest = true;
 
     rawRequest.insert(rawRequest.end(), buffer.begin(), buffer.begin() + packetSize);
-    for (int i = 0; i < packetSize; i++) {
-      rawRequest.push_back(buffer[i]);
-    }
 
-    if (parserState == ParserState::PARSE_START_LINE) {
+    if (parserState == ParserState::PARSE_REQUEST_LINE) {
       // We haven't even received all the start-line data yet. Wait until we do.
       if (!HttpRequestParser::queueContainsSequential("\r\n", rawRequest)) continue;
 
-      parseStartLine();
+      parseRequestLine();
     } 
 
     if (parserState == ParserState::PARSE_HEADERS) {
@@ -42,8 +40,10 @@ bool HttpRequestParser::parseIncomingRequest() {
   return isRealRequest;
 }
 
-void HttpRequestParser::parseStartLine() {
+void HttpRequestParser::parseRequestLine() {
   request.method = accumulateUntil(' ');
+  HttpRequestValidator::validateMethod(request.method);
+
   request.path = accumulateUntil({'?', ' '});
 
   // If it weren't for the need to iterate over the rawRequest here, we could've used a queue
@@ -61,6 +61,7 @@ void HttpRequestParser::parseStartLine() {
   }
 
   request.protocolVersion = accumulateUntil('\r');
+  HttpRequestValidator::validateProtocolVersion(request.protocolVersion);
   rawRequest.pop_front();
 
   advanceParserState();
@@ -140,7 +141,7 @@ bool HttpRequestParser::queueContainsSequential(const std::string &chars, const 
 }
 
 void HttpRequestParser::advanceParserState() {
-  if (parserState == ParserState::PARSE_START_LINE) parserState = ParserState::PARSE_HEADERS;
+  if (parserState == ParserState::PARSE_REQUEST_LINE) parserState = ParserState::PARSE_HEADERS;
   else if (parserState == ParserState::PARSE_HEADERS) parserState = ParserState::PARSE_BODY;
   else parserState = ParserState::FINISHED;
 }

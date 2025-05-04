@@ -4,7 +4,7 @@
 #include <unordered_set>
 
 enum ParserState {
-  PARSE_START_LINE,
+  PARSE_REQUEST_LINE,
   PARSE_HEADERS,
   PARSE_BODY,
   FINISHED
@@ -19,11 +19,11 @@ private:
   int RECV_BUFFER_SIZE = 8192;
   char prevChar;
   std::deque<char> rawRequest;
-  ParserState parserState = ParserState::PARSE_START_LINE;
+  ParserState parserState = ParserState::PARSE_REQUEST_LINE;
   HttpRequest &request;
   int &socketDescriptor;
 
-  void parseStartLine();
+  void parseRequestLine();
 
   void parseHeaders();
 
