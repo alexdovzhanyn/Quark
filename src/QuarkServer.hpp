@@ -19,18 +19,21 @@ struct FreeAddrinfo {
   }
 };
 
-class QuarkServer {
-public:
-  string serverAddress;
-  string ipVersion = "IPv6";
-  string port;
-  int socketDescriptor;
-  QuarkServer(string serverPort);
+namespace Quark {
+  class Server {
+  public:
+    string serverAddress;
+    string ipVersion = "IPv6";
+    string port;
+    int socketDescriptor;
+    Server(string serverPort);
 
-  void run();
+    void run();
 
-private:
-  bool startupSuccess = false;
+  private:
+    bool startupSuccess = false;
 
-  unique_ptr<addrinfo, FreeAddrinfo> getServerInfo();
-};
+    unique_ptr<addrinfo, FreeAddrinfo> getServerInfo();
+  };
+}
+

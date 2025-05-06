@@ -1,45 +1,42 @@
 #include "ConnectionHandler.hpp"
+#include "QuarkRouter.hpp"
 #include "HttpRequest.hpp"
 #include "HttpRequestParser.hpp"
-#include "HttpResponseBuilder.hpp"
+#include "HttpResponse.hpp"
 #include <iostream>
 #include <sstream>
 #include <chrono>
 #include <iomanip>
 #include "HttpException.hpp"
 
-void ConnectionHandler::handleHttpRequest() {
+void Quark::ConnectionHandler::handleHttpRequest() {
   std::chrono::time_point requestStart = std::chrono::high_resolution_clock::now();
 
   HttpRequest request = HttpRequest(getIpFromSocket());
   HttpRequestParser parser = HttpRequestParser(socketDescriptor, request);
-  HttpResponseBuilder responseBuilder = HttpResponseBuilder();
 
   bool realRequest = false;
   try {
     realRequest = parser.parseIncomingRequest();
   } catch (const HttpException &e) {
-    std::cout << "OH NO SOME ERROR!" << std::endl;
-    responseBuilder.setStatus(e.code, e.what()); 
-    std::string response = responseBuilder.str();
+    HttpResponse response = HttpResponse(e.code, e.what());
+    std::string responseStr = response.str();
 
-    std::cout << "RESPONDING WITH:" << std::endl;
-    std::cout << response << std::endl;
-    send(socketDescriptor, response.c_str(), response.length(), 0);
+    send(socketDescriptor, responseStr.c_str(), responseStr.length(), 0);
 
     logRequest(requestStart, std::chrono::high_resolution_clock::now(), request, e.code);
     return;
   }
 
-  responseBuilder.setStatus(200);
-  std::string response = responseBuilder.str();
-  send(socketDescriptor, response.c_str(), response.length(), 0);
+  HttpResponse response = Router::getInstance().routeRequest(request);
+  std::string responseStr = response.str();
+  send(socketDescriptor, responseStr.c_str(), responseStr.length(), 0);
 
-  if (realRequest) logRequest(requestStart, std::chrono::high_resolution_clock::now(), request, 200);
+  if (realRequest) logRequest(requestStart, std::chrono::high_resolution_clock::now(), request, response.statusCode);
   close(socketDescriptor);
 }
 
-void ConnectionHandler::logRequest(
+void Quark::ConnectionHandler::logRequest(
   const std::chrono::time_point<std::chrono::steady_clock> &requestStart,
   const std::chrono::time_point<std::chrono::steady_clock> &requestEnd,
   const HttpRequest &request,
@@ -60,7 +57,7 @@ void ConnectionHandler::logRequest(
   std::cout << log.str() << std::endl;
 }
 
-std::string ConnectionHandler::getIpFromSocket() {
+std::string Quark::ConnectionHandler::getIpFromSocket() {
   char ip[INET6_ADDRSTRLEN];
 
   if (connectionAddress.ss_family == AF_INET) {

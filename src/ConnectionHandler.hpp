@@ -6,22 +6,24 @@
 #include <unistd.h>
 #include <string>
 
-class ConnectionHandler {
-public:
-  ConnectionHandler(int sock, sockaddr_storage addr) : socketDescriptor(sock), connectionAddress(addr) {}
+namespace Quark {
+  class ConnectionHandler {
+  public:
+    ConnectionHandler(int sock, sockaddr_storage addr) : socketDescriptor(sock), connectionAddress(addr) {}
 
-  void handleHttpRequest();
+    void handleHttpRequest();
 
-private:
-  int socketDescriptor;
-  sockaddr_storage connectionAddress;
+  private:
+    int socketDescriptor;
+    sockaddr_storage connectionAddress;
 
-  void logRequest(
-    const std::chrono::time_point<std::chrono::steady_clock> &requestStart,
-    const std::chrono::time_point<std::chrono::steady_clock> &requestEnd,
-    const HttpRequest &request,
-    const int &statusCode
-  );
+    void logRequest(
+      const std::chrono::time_point<std::chrono::steady_clock> &requestStart,
+      const std::chrono::time_point<std::chrono::steady_clock> &requestEnd,
+      const HttpRequest &request,
+      const int &statusCode
+    );
 
-  std::string getIpFromSocket(); 
-};
+    std::string getIpFromSocket(); 
+  };
+}

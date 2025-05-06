@@ -1,6 +1,6 @@
 #include "QuarkServer.hpp"
 
-unique_ptr<addrinfo, FreeAddrinfo> QuarkServer::getServerInfo() {
+unique_ptr<addrinfo, FreeAddrinfo> Quark::Server::getServerInfo() {
   addrinfo hints{};
   hints.ai_family = AF_UNSPEC;
   hints.ai_socktype = SOCK_STREAM;
@@ -19,7 +19,7 @@ unique_ptr<addrinfo, FreeAddrinfo> QuarkServer::getServerInfo() {
   return unique_ptr<addrinfo, FreeAddrinfo>(rawServInfo);
 }
 
-QuarkServer::QuarkServer(string serverPort) : port(serverPort) {
+Quark::Server::Server(string serverPort) : port(serverPort) {
   unique_ptr<addrinfo, FreeAddrinfo> serverInfo = getServerInfo();  
   void* addr;
 
@@ -52,7 +52,7 @@ QuarkServer::QuarkServer(string serverPort) : port(serverPort) {
   } 
 }
 
-void QuarkServer::run() {
+void Quark::Server::run() {
   if (listen(socketDescriptor, 10) < 0) {
     cerr << "Failed to listen on port " << port << "! " << strerror(errno) << endl;
     close(socketDescriptor);

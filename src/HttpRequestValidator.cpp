@@ -1,7 +1,7 @@
 #include "HttpRequestValidator.hpp"
 #include "HttpException.hpp"
 
-const std::unordered_map<std::string, RequestMethod> HttpRequestValidator::methodMapping = {
+const std::unordered_map<std::string, Quark::RequestMethod> Quark::HttpRequestValidator::methodMapping = {
   { "GET", RequestMethod::GET },
   { "POST", RequestMethod::POST },
   { "PUT", RequestMethod::PUT },
@@ -10,16 +10,16 @@ const std::unordered_map<std::string, RequestMethod> HttpRequestValidator::metho
   { "HEAD", RequestMethod::HEAD }
 };
 
-void HttpRequestValidator::validateMethod(std::string method) {
+void Quark::HttpRequestValidator::validateMethod(std::string method) {
   // Will throw if invalid method name
   methodStringToEnum(method);
 }
 
-void HttpRequestValidator::validateProtocolVersion(std::string version) {
+void Quark::HttpRequestValidator::validateProtocolVersion(std::string version) {
   if (version != "HTTP/1.1") throw VersionNotSupported();
 }
 
-RequestMethod HttpRequestValidator::methodStringToEnum(std::string method) {
+Quark::RequestMethod Quark::HttpRequestValidator::methodStringToEnum(std::string method) {
   if (methodMapping.find(method) == methodMapping.end()) throw MethodNotImplemented();
 
   return methodMapping.at(method);

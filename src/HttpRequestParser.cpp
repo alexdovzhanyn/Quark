@@ -5,7 +5,7 @@
 #include <unordered_set>
 #include <vector>
 
-bool HttpRequestParser::parseIncomingRequest() {
+bool Quark::HttpRequestParser::parseIncomingRequest() {
   std::vector<char> buffer(RECV_BUFFER_SIZE);
   ssize_t packetSize;
 
@@ -40,7 +40,7 @@ bool HttpRequestParser::parseIncomingRequest() {
   return isRealRequest;
 }
 
-void HttpRequestParser::parseRequestLine() {
+void Quark::HttpRequestParser::parseRequestLine() {
   request.method = accumulateUntil(' ');
   HttpRequestValidator::validateMethod(request.method);
 
@@ -67,7 +67,7 @@ void HttpRequestParser::parseRequestLine() {
   advanceParserState();
 }
 
-void HttpRequestParser::parseHeaders() {
+void Quark::HttpRequestParser::parseHeaders() {
   while (!rawRequest.empty() && rawRequest.front() != '\r') {
     std::string headerName = accumulateUntil(':');
     rawRequest.pop_front(); // Skip the space between kv pairs
@@ -85,7 +85,7 @@ void HttpRequestParser::parseHeaders() {
   advanceParserState();
 }
 
-void HttpRequestParser::parseQueryParams() {
+void Quark::HttpRequestParser::parseQueryParams() {
   while (!rawRequest.empty() && rawRequest.front() != ' ') {
     std::string paramName = accumulateUntil('=', {'?'});
     std::string paramValue = accumulateUntil({'&', ' '});
@@ -97,11 +97,14 @@ void HttpRequestParser::parseQueryParams() {
   }
 }
 
-std::string HttpRequestParser::accumulateUntil(char delimiter, const std::unordered_set<char> &skipChars) {
+std::string Quark::HttpRequestParser::accumulateUntil(char delimiter, const std::unordered_set<char> &skipChars) {
   return accumulateUntil(std::unordered_set<char>{ delimiter }, skipChars);
 }
 
-std::string HttpRequestParser::accumulateUntil(const std::unordered_set<char> &delimiters, const std::unordered_set<char> &skipChars) {
+std::string Quark::HttpRequestParser::accumulateUntil(
+  const std::unordered_set<char> &delimiters,
+  const std::unordered_set<char> &skipChars
+) {
   std::string acc;
 
   while (!rawRequest.empty() && delimiters.find(rawRequest.front()) == delimiters.end()) {
@@ -125,7 +128,7 @@ std::string HttpRequestParser::accumulateUntil(const std::unordered_set<char> &d
   return acc;
 }
 
-bool HttpRequestParser::queueContainsSequential(const std::string &chars, const std::deque<char> &q) {
+bool Quark::HttpRequestParser::queueContainsSequential(const std::string &chars, const std::deque<char> &q) {
   if (chars.empty() || q.empty() || chars.size() > q.size()) return false;
 
   for (auto it = q.begin(); it != q.end(); ++it) {
@@ -140,7 +143,7 @@ bool HttpRequestParser::queueContainsSequential(const std::string &chars, const 
   return false;
 }
 
-void HttpRequestParser::advanceParserState() {
+void Quark::HttpRequestParser::advanceParserState() {
   if (parserState == ParserState::PARSE_REQUEST_LINE) parserState = ParserState::PARSE_HEADERS;
   else if (parserState == ParserState::PARSE_HEADERS) parserState = ParserState::PARSE_BODY;
   else parserState = ParserState::FINISHED;

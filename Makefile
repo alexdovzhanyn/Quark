@@ -1,23 +1,23 @@
-CXX := /usr/bin/clang++
-CXXFLAGS := -std=c++17 -Wall -Wextra -pedantic -g
+CXX := clang++
+CXXFLAGS := -std=c++17 -Wall -Wextra -pedantic -g -Isrc
 
-TARGET := quark_server
 SRC_DIR := src
 BUILD_DIR := build
+LIB := $(BUILD_DIR)/libquark.a
 
-SRCS := main.cpp $(wildcard $(SRC_DIR)/*.cpp)
-OBJS := $(patsubst %.cpp,$(BUILD_DIR)/%.o,$(SRCS))
-FINAL_TARGET := $(BUILD_DIR)/$(TARGET)
+SRC := $(wildcard $(SRC_DIR)/*.cpp)
+OBJ := $(addprefix $(BUILD_DIR)/, $(notdir $(SRC:.cpp=.o)))
 
-all: $(FINAL_TARGET)
+all: $(LIB)
 
-$(FINAL_TARGET): $(OBJS)
+$(LIB): $(OBJ)
+	ar rcs $@ $^
+
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@mkdir -p $(BUILD_DIR)
-	$(CXX) $(CXXFLAGS) -o $@ $^
-
-$(BUILD_DIR)/%.o: %.cpp
-	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
 	rm -rf $(BUILD_DIR)
+
+.PHONY: all clean
