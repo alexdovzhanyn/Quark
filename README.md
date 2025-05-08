@@ -39,7 +39,7 @@ make                # builds example_app into ../build/
 Inside your app, you can define routes like:
 
 ```cpp
-Quark::Router::get("/hello", [](HttpRequest &req, HttpResponse &res) {
+Quark::Router::GET("/hello", [](HttpRequest &req, HttpResponse &res) {
   res.setStatus(200, "OK");
   res.setBody("Hello, world!");
   res.addHeader("Content-Type", "text/plain");
@@ -49,7 +49,7 @@ Quark::Router::get("/hello", [](HttpRequest &req, HttpResponse &res) {
 or pass a reference to a static controller method:
 
 ```cpp
-Quark::Router::get("/hello", YourController::someStaticMethod);
+Quark::Router::GET("/hello", YourController::someStaticMethod);
 ```
 
 ---
