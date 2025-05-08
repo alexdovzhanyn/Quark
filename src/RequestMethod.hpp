@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 namespace Quark {
   enum RequestMethod {
@@ -9,4 +10,6 @@ namespace Quark {
     OPTIONS,
     HEAD
   };
+
+  std::string requestMethodToString(RequestMethod method);
 }

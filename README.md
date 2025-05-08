@@ -29,17 +29,17 @@ make                # builds libquark.a into build/
 ```bash
 cd example
 make                # builds example_app into ../build/
-../build/example_app
+./build/example_app
 ```
 
 ---
 
 ## Example Routes
 
-Inside `example/main.cpp`, you can define routes like:
+Inside your app, you can define routes like:
 
 ```cpp
-router.get("/hello", [](HttpRequest &req, HttpResponse &res) {
+Quark::Router::get("/hello", [](HttpRequest &req, HttpResponse &res) {
   res.setStatus(200, "OK");
   res.setBody("Hello, world!");
   res.addHeader("Content-Type", "text/plain");
@@ -49,7 +49,7 @@ router.get("/hello", [](HttpRequest &req, HttpResponse &res) {
 or pass a reference to a static controller method:
 
 ```cpp
-router.get("/hello", YourController::someStaticMethod);
+Quark::Router::get("/hello", YourController::someStaticMethod);
 ```
 
 ---

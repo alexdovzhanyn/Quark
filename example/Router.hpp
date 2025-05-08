@@ -6,11 +6,9 @@
 class Router {
 public:
   static void registerRoutes() {
-    Quark::Router &router = Quark::Router::getInstance();
+    Quark::Router::GET("/", ApplicationController::getRoot);
+    Quark::Router::GET("/hello", ApplicationController::helloWorld);
 
-    router.get("/", ApplicationController::getRoot);
-    router.get("/hello", ApplicationController::helloWorld);
-
-    router.post("/user/create", UserController::createUser);
+    Quark::Router::POST("/user/create", UserController::createUser);
   }
 };
