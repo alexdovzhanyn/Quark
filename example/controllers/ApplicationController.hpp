@@ -4,19 +4,23 @@
 
 class ApplicationController {
 public:
-  static void getRoot(Quark::HttpRequest &request, Quark::HttpResponse &response) {
-    response.setStatus(200);
-    response.addHeader("Content-Type", "text/json");
-    response.setBody(R"({
+  static Quark::HttpResponse getRoot(Quark::HttpRequest &request) {
+    return Quark::HttpResponse::ok(R"({
       "location": "root"
-    })");
+    })")
+    .addHeader("Content-Type", "application/json");
   }
 
-  static void helloWorld(Quark::HttpRequest &request, Quark::HttpResponse &response) {
-    response.setStatus(200);
-    response.addHeader("Content-Type", "text/json");
-    response.setBody(R"({
-      "hello": "world"
-    })");
+  static Quark::HttpResponse helloWorld(Quark::HttpRequest &request) {
+    Quark::HttpResponse response = Quark::HttpResponse();
+
+    response
+      .setStatus(200)
+      .addHeader("Content-Type", "text/json")
+      .setBody(R"({
+        "hello": "world"
+      })");
+
+    return response;
   }
 };

@@ -6,14 +6,12 @@ int main() {
 
   Quark::Router &router = Quark::Router::getInstance();
 
-  router.POST("/meow/cow", [](Quark::HttpRequest &request, Quark::HttpResponse &response) {
-    std::cout << "GOT HIT!" << std::endl;
-    response.setStatus(200);
-    response.addHeader("Content-Type", "text/json");
-    response.setBody(R"({
+  router.POST("/meow/cow", [](Quark::HttpRequest &request) {
+    return Quark::HttpResponse::ok(R"({
       "name": "Douglas",
       "age": 23
-    })");
+    })")
+    .addHeader("Content-Type", "text/json");
   });
 
   server.run();

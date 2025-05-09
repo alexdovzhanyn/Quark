@@ -18,33 +18,18 @@ void Quark::Router::DELETE(std::string route, RouteHandler handler) {
 }
 
 Quark::HttpResponse Quark::Router::routeRequest(HttpRequest& request) {
-  HttpResponse response = HttpResponse();
-
   RequestMethod requestMethod = request.getRequestMethod();
   std::string requestPath = request.path;
 
-  if (routeMapping.find(requestPath) == routeMapping.end()) {
-    response.setStatus(404, "Not Found");
-    return response;
-  }
+  if (routeMapping.find(requestPath) == routeMapping.end()) return HttpResponse::notFound();
 
-  if (requestMethod == RequestMethod::OPTIONS) {
-    handleOptionsRequest(requestPath, response);
-    return response;
-  }
+  if (requestMethod == RequestMethod::OPTIONS) return handleOptionsRequest(requestPath);
 
-  if (requestMethod == RequestMethod::HEAD) {
-    handleHeadRequest(requestPath, request, response); 
-    return response;
-  }
+  if (requestMethod == RequestMethod::HEAD) return handleHeadRequest(requestPath, request); 
 
-  if (routeMapping[requestPath].find(requestMethod) == routeMapping[requestPath].end()) {
-    response.setStatus(404, "Not Found");
-  } else {
-    routeMapping[request.path][request.getRequestMethod()](request, response);   
-  }
-
-  return response;
+  if (routeMapping[requestPath].find(requestMethod) == routeMapping[requestPath].end()) return HttpResponse::notFound();
+    
+  return routeMapping[request.path][request.getRequestMethod()](request);   
 }
 
 void Quark::Router::addRoute(const RequestMethod &method, const std::string &route, RouteHandler handler) {
@@ -52,8 +37,8 @@ void Quark::Router::addRoute(const RequestMethod &method, const std::string &rou
   router.routeMapping[route][method] = std::move(handler);
 }
 
-void Quark::Router::handleOptionsRequest(std::string &path, HttpResponse &response) {
-  response.setStatus(200, "OK");
+Quark::HttpResponse Quark::Router::handleOptionsRequest(std::string &path) {
+  HttpResponse response = HttpResponse::ok();
 
   std::ostrstream oss;
 
@@ -70,15 +55,11 @@ void Quark::Router::handleOptionsRequest(std::string &path, HttpResponse &respon
     oss << ", HEAD";
   }
 
-  response.addHeader("Allow", oss.str());
+  return response.addHeader("Allow", oss.str());
 } 
 
-void Quark::Router::handleHeadRequest(std::string &path, HttpRequest &request, HttpResponse &response) {
-  if (routeMapping[path].find(RequestMethod::GET) == routeMapping[path].end()) {
-    response.setStatus(404, "Not Found");
-    return;
-  }
+Quark::HttpResponse Quark::Router::handleHeadRequest(std::string &path, HttpRequest &request) {
+  if (routeMapping[path].find(RequestMethod::GET) == routeMapping[path].end()) return HttpResponse::notFound();
 
-  routeMapping[path][RequestMethod::GET](request, response);
-  response.setBody("");
+  return routeMapping[path][RequestMethod::GET](request).setBody("");
 }

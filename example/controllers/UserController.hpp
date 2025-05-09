@@ -4,12 +4,12 @@
 
 class UserController {
 public:
-  static void createUser(Quark::HttpRequest &request, Quark::HttpResponse &response) {
-    response.setStatus(201);
-    response.addHeader("Content-Type", "text/json");
-    response.setBody(R"({
-      "name": "Mike Wazowski",
-      "age": 38
-    })");
+  static Quark::HttpResponse createUser(Quark::HttpRequest &request) {
+    return Quark::HttpResponse::ok()
+      .setBody(R"({
+        "name": "Mike Wazowski",
+        "age": 38
+      })")
+      .addHeader("Content-Type", "text/json");
   }
 };

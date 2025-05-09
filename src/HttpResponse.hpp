@@ -9,10 +9,13 @@ namespace Quark {
 
     HttpResponse() = default;
     HttpResponse(int status, std::string message) : statusCode(status), statusMessage(message) {}
+
+    static HttpResponse ok(const std::string &body = "");
+    static HttpResponse notFound();
     
-    void setStatus(int status, std::string message = "");
-    void setBody(std::string bod);
-    void addHeader(const std::string &headerName, const std::string &headerValue);
+    HttpResponse& setStatus(int status, std::string message = "");
+    HttpResponse& setBody(std::string bod);
+    HttpResponse& addHeader(const std::string &headerName, const std::string &headerValue);
 
     std::string str();
   private:

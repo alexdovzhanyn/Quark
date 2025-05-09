@@ -2,17 +2,33 @@
 #include <sstream>
 #include <iostream>
 
-void Quark::HttpResponse::setStatus(int status, std::string message) {
+Quark::HttpResponse& Quark::HttpResponse::setStatus(int status, std::string message) {
   statusCode = status;
   statusMessage = message;
+
+  return *this;
 }
 
-void Quark::HttpResponse::setBody(std::string bod) {
+Quark::HttpResponse& Quark::HttpResponse::setBody(std::string bod) {
   body = bod;
+  return *this;
 }
 
-void Quark::HttpResponse::addHeader(const std::string &headerName, const std::string &headerValue) {
+Quark::HttpResponse& Quark::HttpResponse::addHeader(const std::string &headerName, const std::string &headerValue) {
   headers.insert({ headerName, headerValue });
+  return *this;
+}
+
+Quark::HttpResponse Quark::HttpResponse::ok(const std::string &body) {
+  HttpResponse response = HttpResponse(200, "OK");
+
+  response.setBody(body);
+
+  return response;
+}
+
+Quark::HttpResponse Quark::HttpResponse::notFound() {
+  return HttpResponse(404, "Not Found");
 }
 
 std::string Quark::HttpResponse::str() {

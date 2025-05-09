@@ -8,7 +8,7 @@
 namespace Quark {
   class Router {
   public:
-    using RouteHandler = std::function<void(HttpRequest&, HttpResponse&)>;
+    using RouteHandler = std::function<HttpResponse(HttpRequest&)>;
     using RouteTable = std::unordered_map<RequestMethod, RouteHandler>;
 
     static Router& getInstance() {
@@ -36,9 +36,9 @@ namespace Quark {
 
     static void addRoute(const RequestMethod &method, const std::string &route, RouteHandler handler);
 
-    void handleOptionsRequest(std::string &path, HttpResponse &response);
+    HttpResponse handleOptionsRequest(std::string &path);
 
-    void handleHeadRequest(std::string &path, HttpRequest &request, HttpResponse &response); 
+    HttpResponse handleHeadRequest(std::string &path, HttpRequest &request); 
   };
 }
 
