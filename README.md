@@ -39,10 +39,10 @@ make                # builds example_app into ../build/
 Inside your app, you can define routes like:
 
 ```cpp
-Quark::Router::GET("/hello", [](HttpRequest &req, HttpResponse &res) {
-  res.setStatus(200, "OK");
-  res.setBody("Hello, world!");
-  res.addHeader("Content-Type", "text/plain");
+Quark::Router::GET("/hello", [](HttpRequest &req) {
+  return Quark::HttpResponse::ok()
+    .setBody("Hello, world!")
+    .addHeader("Content-Type", "text/plain");
 });
 ```
 

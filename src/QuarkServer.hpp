@@ -27,6 +27,8 @@ namespace Quark {
     string port;
     int socketDescriptor;
     Server(string serverPort);
+  
+    void staticServe(const std::string &path);
 
     void run();
 

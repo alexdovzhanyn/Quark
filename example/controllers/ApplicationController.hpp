@@ -5,10 +5,7 @@
 class ApplicationController {
 public:
   static Quark::HttpResponse getRoot(Quark::HttpRequest &request) {
-    return Quark::HttpResponse::ok(R"({
-      "location": "root"
-    })")
-    .addHeader("Content-Type", "application/json");
+    return Quark::HttpResponse::sendFile("public/index.html");
   }
 
   static Quark::HttpResponse helloWorld(Quark::HttpRequest &request) {

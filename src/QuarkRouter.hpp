@@ -26,8 +26,11 @@ namespace Quark {
 
     HttpResponse routeRequest(HttpRequest& request); 
 
+    static void setStaticServePath(const std::string &path);
+
   private:
     std::unordered_map<std::string, RouteTable> routeMapping;
+    std::string staticServePath = "public";
 
     Router() = default;
 
@@ -35,6 +38,10 @@ namespace Quark {
     Router& operator=(const Router&) = delete;
 
     static void addRoute(const RequestMethod &method, const std::string &route, RouteHandler handler);
+
+    bool isValidRoute(const std::string &path);
+
+    HttpResponse handleRequest(HttpRequest &request);
 
     HttpResponse handleOptionsRequest(std::string &path);
 

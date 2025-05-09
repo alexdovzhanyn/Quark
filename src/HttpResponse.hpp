@@ -12,10 +12,11 @@ namespace Quark {
 
     static HttpResponse ok(const std::string &body = "");
     static HttpResponse notFound();
+    static HttpResponse internalServerError();
     static HttpResponse sendFile(const std::string &filePath);
     
     HttpResponse& setStatus(int status, std::string message = "");
-    HttpResponse& setBody(std::string bod);
+    HttpResponse& setBody(std::string bod, bool updateContentLength = true);
     HttpResponse& addHeader(const std::string &headerName, const std::string &headerValue);
 
     template <typename T>

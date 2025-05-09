@@ -1,4 +1,5 @@
 #include "QuarkServer.hpp"
+#include "QuarkRouter.hpp"
 
 unique_ptr<addrinfo, FreeAddrinfo> Quark::Server::getServerInfo() {
   addrinfo hints{};
@@ -50,6 +51,10 @@ Quark::Server::Server(string serverPort) : port(serverPort) {
     close(socketDescriptor);
     exit(1);
   } 
+}
+
+void Quark::Server::staticServe(const std::string &path) {
+  Quark::Router::setStaticServePath(path);
 }
 
 void Quark::Server::run() {
