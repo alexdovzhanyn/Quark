@@ -12,10 +12,18 @@ namespace Quark {
 
     static HttpResponse ok(const std::string &body = "");
     static HttpResponse notFound();
+    static HttpResponse sendFile(const std::string &filePath);
     
     HttpResponse& setStatus(int status, std::string message = "");
     HttpResponse& setBody(std::string bod);
     HttpResponse& addHeader(const std::string &headerName, const std::string &headerValue);
+
+    template <typename T>
+    auto json(const T &obj) -> decltype(std::declval<T>().to_json(), std::declval<HttpResponse&>()) {
+      setBody(obj.to_json());
+      addHeader("Content-Type", "application/json");
+      return *this;
+    }
 
     std::string str();
   private:

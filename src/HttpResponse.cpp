@@ -11,11 +11,12 @@ Quark::HttpResponse& Quark::HttpResponse::setStatus(int status, std::string mess
 
 Quark::HttpResponse& Quark::HttpResponse::setBody(std::string bod) {
   body = bod;
+  addHeader("Content-Length", std::to_string(body.length()));
   return *this;
 }
 
 Quark::HttpResponse& Quark::HttpResponse::addHeader(const std::string &headerName, const std::string &headerValue) {
-  headers.insert({ headerName, headerValue });
+  headers[headerName] = headerValue;
   return *this;
 }
 
@@ -38,8 +39,6 @@ std::string Quark::HttpResponse::str() {
   oss << protocolVersion << " " << std::to_string(statusCode) << " " << statusMessage << "\r\n";
 
   // Headers
-  oss << "Content-Length: " << body.length() << "\r\n";
-
   for (auto it : headers) {
     oss << it.first << ": " << it.second << "\r\n";
   }

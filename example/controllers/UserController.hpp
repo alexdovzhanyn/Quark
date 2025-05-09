@@ -1,15 +1,13 @@
 #pragma once
 #include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
+#include "../models/User.hpp"
 
 class UserController {
 public:
   static Quark::HttpResponse createUser(Quark::HttpRequest &request) {
-    return Quark::HttpResponse::ok()
-      .setBody(R"({
-        "name": "Mike Wazowski",
-        "age": 38
-      })")
-      .addHeader("Content-Type", "text/json");
+    User user = User("Mike Wazowski", 25, "mike.wazowski@monstersinc.com");
+
+    return Quark::HttpResponse::ok().json(user);
   }
 };
