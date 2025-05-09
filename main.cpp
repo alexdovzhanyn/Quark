@@ -2,11 +2,11 @@
 #include "src/QuarkRouter.hpp"
 
 int main() {
-  QuarkServer server = QuarkServer("9669");
+  Quark::Server server = Quark::Server("9669");
 
-  QuarkRouter &router = QuarkRouter::getInstance();
+  Quark::Router &router = Quark::Router::getInstance();
 
-  router.post("/meow/cow", [](HttpRequest &request, HttpResponse &response) {
+  router.POST("/meow/cow", [](Quark::HttpRequest &request, Quark::HttpResponse &response) {
     std::cout << "GOT HIT!" << std::endl;
     response.setStatus(200);
     response.addHeader("Content-Type", "text/json");
