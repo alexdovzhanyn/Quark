@@ -3,6 +3,7 @@
 #include "RequestMethod.hpp"
 #include "HttpResponse.hpp"
 #include <unordered_map>
+#include <functional>
 
 namespace Quark {
   class Router {
