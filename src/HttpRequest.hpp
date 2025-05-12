@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include <unordered_map>
+#include <any>
 
 namespace Quark {
   class HttpRequest {
@@ -15,7 +16,7 @@ namespace Quark {
     std::string protocolVersion;
     std::unordered_map<std::string, std::string> queryParams;
     std::unordered_map<std::string, std::string> headers;
-    std::string body;
+    std::string rawBody;
     
     HttpRequest(std::string ipAddr) : ip(ipAddr) {}
 
@@ -59,5 +60,22 @@ namespace Quark {
 
       return oss.str();
     }
+
+    template <typename T>
+    T& body() {
+      if (!parsedBody.has_value() || parsedBody.type() != typeid(T)) {
+        throw std::bad_any_cast();
+      }
+
+      return std::any_cast<T&>(parsedBody);
+    }
+
+    template <typename T>
+    void setBody(const T& parsed) {
+      parsedBody = parsed;
+    }
+
+  private:
+    std::any parsedBody;
   };
 }

@@ -1,4 +1,5 @@
 #pragma once 
+#include <functional>
 #include <iostream>
 #include <memory>
 #include <cstring>
@@ -9,7 +10,10 @@
 #include <thread>
 #include <arpa/inet.h>
 #include <sys/types.h>
+#include <vector>
 #include "ConnectionHandler.hpp"
+#include "HttpRequest.hpp"
+#include "HttpResponse.hpp"
 
 using namespace std;
 
@@ -30,12 +34,18 @@ namespace Quark {
   
     void staticServe(const std::string &path);
 
+    Server& registerRequestMiddleware(std::function<void(HttpRequest&)> middlewareHandler);
+    Server& registerResponseMiddleware(std::function<void(HttpResponse&)> middlewareHandler);
+
     void run();
 
   private:
     bool startupSuccess = false;
 
     unique_ptr<addrinfo, FreeAddrinfo> getServerInfo();
+
+    vector<std::function<void(HttpRequest&)>> requestMiddlewares;
+    vector<std::function<void(HttpResponse&)>> responseMiddlewares;
   };
 }
 

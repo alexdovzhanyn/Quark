@@ -28,12 +28,27 @@ void Quark::ConnectionHandler::handleHttpRequest() {
     return;
   }
 
+  applyRequestMiddleware(request);
   HttpResponse response = Router::getInstance().routeRequest(request);
+  applyResponseMiddleware(response);
+
   std::string responseStr = response.str();
   send(socketDescriptor, responseStr.c_str(), responseStr.length(), 0);
 
   if (realRequest) logRequest(requestStart, std::chrono::high_resolution_clock::now(), request, response.statusCode);
   close(socketDescriptor);
+}
+
+void Quark::ConnectionHandler::applyRequestMiddleware(HttpRequest &request) {
+  for (auto middleware : requestMiddlewares) {
+    middleware(request);
+  }
+} 
+
+void Quark::ConnectionHandler::applyResponseMiddleware(HttpResponse &response) {
+  for (auto middleware : responseMiddlewares) {
+    middleware(response);
+  }
 }
 
 void Quark::ConnectionHandler::logRequest(

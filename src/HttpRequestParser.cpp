@@ -33,8 +33,11 @@ bool Quark::HttpRequestParser::parseIncomingRequest() {
 
     if (request.headers.find("Content-Length") == request.headers.end()) break;
 
-    // TODO: parse the body or something here
-    if (std::stoul(request.headers.at("Content-Length")) == rawRequest.size()) break;
+    if (std::stoul(request.headers.at("Content-Length")) == rawRequest.size()) {
+      request.rawBody.insert(request.rawBody.end(), rawRequest.begin(), rawRequest.end());
+      request.setBody(request.rawBody);
+      break;
+    }
   }
 
   return isRealRequest;
