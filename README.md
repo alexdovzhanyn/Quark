@@ -118,3 +118,4 @@ server.run();
 
 - TLS support (OpenSSL)
 - Streaming responses and chunked encoding
+- Path parameter support
