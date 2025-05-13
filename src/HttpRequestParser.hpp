@@ -15,7 +15,7 @@ namespace Quark {
   public:
     HttpRequestParser(int &sock, HttpRequest &req) : request(req), socketDescriptor(sock) {} 
 
-    bool parseIncomingRequest();
+    bool parseIncomingRequest(int timeout);
   private:
     int RECV_BUFFER_SIZE = 8192;
     char prevChar;

@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include <unordered_map>
+#include <chrono>
 #include <any>
 
 namespace Quark {
@@ -14,6 +15,7 @@ namespace Quark {
     std::string method;
     std::string queryString;
     std::string protocolVersion;
+    std::optional<std::chrono::time_point<std::chrono::high_resolution_clock>> requestStart;
     std::unordered_map<std::string, std::string> queryParams;
     std::unordered_map<std::string, std::string> headers;
     std::string rawBody;

@@ -7,8 +7,14 @@ namespace Quark {
   public:
     int statusCode;
 
-    HttpResponse() = default;
-    HttpResponse(int status, std::string message) : statusCode(status), statusMessage(message) {}
+    HttpResponse() {
+      addHeader("Connection", "close");
+    }
+
+    HttpResponse(int status, std::string message) : HttpResponse() {
+      statusCode = status;
+      statusMessage = message;
+    }
 
     static HttpResponse ok(const std::string &body = "");
     static HttpResponse notFound();

@@ -28,12 +28,18 @@ namespace Quark {
     sockaddr_storage connectionAddress;
     const std::vector<RequestMiddlewareHandler> requestMiddlewares;
     const std::vector<ResponseMiddlewareHandler> responseMiddlewares;
+    const int MAX_REQUEST_TIMEOUT = 30; // Seconds
+    const int MAX_KEEPALIVE_REQUESTS = 100;
+
+    int requestsProcessed = 0;
 
     void applyRequestMiddleware(HttpRequest &request);
     void applyResponseMiddleware(HttpResponse &response);
+
+    int awaitActivity();
+    void closeConnection();
     
     void logRequest(
-      const std::chrono::time_point<std::chrono::steady_clock> &requestStart,
       const std::chrono::time_point<std::chrono::steady_clock> &requestEnd,
       const HttpRequest &request,
       const int &statusCode

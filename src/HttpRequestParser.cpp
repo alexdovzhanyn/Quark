@@ -1,20 +1,31 @@
 #include "HttpRequestParser.hpp"
+#include "HttpException.hpp"
 #include "HttpRequestValidator.hpp"
+#include <stdexcept>
 #include <string>
 #include <sys/socket.h>
 #include <unordered_set>
 #include <vector>
 
-bool Quark::HttpRequestParser::parseIncomingRequest() {
+bool Quark::HttpRequestParser::parseIncomingRequest(int timeout) {
   std::vector<char> buffer(RECV_BUFFER_SIZE);
   ssize_t packetSize;
 
   // Some clients seem to make extra empty dummy requests for some reason, which just immediately
   // open and close the connection. We don't want to bother logging those for now
-  bool isRealRequest = false;
-  while ((packetSize = recv(socketDescriptor, buffer.data(), buffer.size(), 0)) > 0) {
-    isRealRequest = true;
+  bool isRealRequest = false; 
 
+  std::chrono::time_point timeoutStart = std::chrono::high_resolution_clock::now();
+  while ((packetSize = recv(socketDescriptor, buffer.data(), buffer.size(), 0)) > 0) {
+    if (!request.requestStart.has_value()) {
+      request.requestStart = std::chrono::high_resolution_clock::now();
+    }
+
+    std::chrono::time_point timeNow = std::chrono::high_resolution_clock::now();
+    if (timeNow - timeoutStart  > std::chrono::seconds(timeout)) throw RequestTimeout();
+
+    isRealRequest = true;
+    
     rawRequest.insert(rawRequest.end(), buffer.begin(), buffer.begin() + packetSize);
 
     if (parserState == ParserState::PARSE_REQUEST_LINE) {
