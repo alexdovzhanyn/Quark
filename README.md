@@ -116,6 +116,5 @@ server.run();
 
 ## Future Work
 
-- HTTP keep-alive support
 - TLS support (OpenSSL)
 - Streaming responses and chunked encoding
