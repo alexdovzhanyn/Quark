@@ -34,7 +34,7 @@ Quark::HttpResponse Quark::HttpResponse::ok(const std::string &body) {
 }
 
 Quark::HttpResponse Quark::HttpResponse::notFound() {
-  return HttpResponse(404, "Not Found");
+  return HttpResponse(404, "Not Found").addHeader("Content-Length", "0");
 }
 
 Quark::HttpResponse Quark::HttpResponse::internalServerError() {

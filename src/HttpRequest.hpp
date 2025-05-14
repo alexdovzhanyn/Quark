@@ -17,6 +17,7 @@ namespace Quark {
     std::string protocolVersion;
     std::optional<std::chrono::time_point<std::chrono::high_resolution_clock>> requestStart;
     std::unordered_map<std::string, std::string> queryParams;
+    std::unordered_map<std::string, std::string> pathParams;
     std::unordered_map<std::string, std::string> headers;
     std::string rawBody;
     
@@ -38,26 +39,34 @@ namespace Quark {
       oss << "  method: '" << method << "'," << std::endl;
       oss << "  path: '" << path << "'," << std::endl;
       oss << "  queryString: '" << queryString << "'," << std::endl;
+    
       oss << "  queryParams: {" << std::endl;
-      
       int i = 0;
       for (auto it = queryParams.begin(); it != queryParams.end(); it++) {
         if (i > 0) oss << "," << std::endl;
         oss << "    '" << it->first << "': '" << it->second << "'"; 
         i++;
       }
-
       oss << std::endl << "  }," << std::endl;
-      oss << "  headers: {" << std::endl;
 
+      oss << "  pathParams: {" << std::endl;
+      i = 0;
+      for (auto it = pathParams.begin(); it != pathParams.end(); it++) {
+        if (i > 0) oss << "," << std::endl;
+        oss << "    '" << it->first << "': '" << it->second << "'"; 
+        i++;
+      }
+      oss << std::endl << "  }," << std::endl;
+
+      oss << "  headers: {" << std::endl;
       i = 0;
       for (auto it = headers.begin(); it != headers.end(); it++) {
         if (i > 0) oss << "," << std::endl;
         oss << "    '" << it->first << "': '" << it->second << "'"; 
         i++;
       }
-
       oss << std::endl << "  }" << std::endl;
+
       oss << "}" << std::endl;
 
       return oss.str();

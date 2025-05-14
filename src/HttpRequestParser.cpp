@@ -1,6 +1,8 @@
 #include "HttpRequestParser.hpp"
 #include "HttpException.hpp"
+#include "RouteNode.hpp"
 #include "HttpRequestValidator.hpp"
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <sys/socket.h>
@@ -77,7 +79,7 @@ void Quark::HttpRequestParser::parseRequestLine() {
   request.protocolVersion = accumulateUntil('\r');
   HttpRequestValidator::validateProtocolVersion(request.protocolVersion);
   rawRequest.pop_front();
-
+  
   advanceParserState();
 }
 
@@ -108,6 +110,26 @@ void Quark::HttpRequestParser::parseQueryParams() {
 
     // In case we skipped past the end of the queryString by accident
     if (prevChar == ' ') break;
+  }
+}
+
+void Quark::HttpRequestParser::parsePathParams(Quark::HttpRequest &request, std::shared_ptr<Quark::RouteNode> matchedRoute) {
+  if (!matchedRoute) return;
+
+  std::shared_ptr<RouteNode> currNode = matchedRoute;
+  std::string curr;
+
+  for (int i = 1; i < request.path.length() && currNode; i++) {
+    if (request.path[i] != '/') curr += request.path[i];
+    
+    if (request.path[i] == '/' || i == request.path.length() - 1) {
+      if (currNode->isWildcard) {
+        request.pathParams[currNode->val.substr(1)] = curr;
+      }
+
+      currNode = currNode->next;
+      curr = "";
+    }
   }
 }
 

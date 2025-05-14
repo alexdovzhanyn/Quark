@@ -20,4 +20,8 @@ public:
 
     return response;
   }
+
+  static Quark::HttpResponse pathParamTest(Quark::HttpRequest &request) {
+    return Quark::HttpResponse::ok();
+  }
 };

@@ -66,8 +66,17 @@ Quark::Router::GET("/cat", [](Quark::HttpRequest &req) {
 or
 
 ```cpp
-Quark::Router::GET("/home", [](Quark::HttpRequest &res) {
+Quark::Router::GET("/home", [](Quark::HttpRequest &req) {
   return Quark::HttpResponse::sendFile("public/index.html");
+})
+```
+
+Path parameters are also supported, by passing in a `:` followed by the path parameter name:
+
+```cpp
+Quark::ROUTER::GET("/:userId/details", [](Quark::HttpRequest &req) {
+  std::string userId = req.pathParams["userId"]; // will contain whatever userId was passed in the url
+  return Quark::HttpResponse::ok();
 })
 ```
 
@@ -118,4 +127,3 @@ server.run();
 
 - TLS support (OpenSSL)
 - Streaming responses and chunked encoding
-- Path parameter support

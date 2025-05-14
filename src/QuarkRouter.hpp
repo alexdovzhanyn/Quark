@@ -2,6 +2,8 @@
 #include "HttpRequest.hpp"
 #include "RequestMethod.hpp"
 #include "HttpResponse.hpp"
+#include "RouteNode.hpp"
+#include <memory>
 #include <unordered_map>
 #include <functional>
 
@@ -29,7 +31,10 @@ namespace Quark {
     static void setStaticServePath(const std::string &path);
 
   private:
-    std::unordered_map<std::string, RouteTable> routeMapping;
+    std::unordered_map<std::string, RouteTable> simpleRoutes;
+    std::unordered_map<std::shared_ptr<RouteNode>, RouteTable> complexRoutes;
+
+
     std::string staticServePath = "public";
 
     Router() = default;
@@ -38,6 +43,11 @@ namespace Quark {
     Router& operator=(const Router&) = delete;
 
     static void addRoute(const RequestMethod &method, const std::string &route, RouteHandler handler);
+
+    static std::shared_ptr<RouteNode> parsePathParams(const std::string &route);
+
+    std::shared_ptr<RouteNode> findMatchingRoute(const std::string &path);
+    std::optional<RouteTable*> findRouteTableForRoute(const std::string &path); 
 
     bool isValidRoute(const std::string &path);
 
