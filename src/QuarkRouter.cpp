@@ -12,6 +12,10 @@ void Quark::Router::GET(std::string route, RouteHandler handler) {
   addRoute(RequestMethod::GET, route, handler);
 }
 
+void Quark::Router::PATCH(std::string route, RouteHandler handler) {
+  addRoute(RequestMethod::PATCH, route, handler);
+}
+
 void Quark::Router::POST(std::string route, RouteHandler handler) {
   addRoute(RequestMethod::POST, route, handler);
 }

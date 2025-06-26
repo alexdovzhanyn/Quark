@@ -3,6 +3,7 @@
 
 const std::unordered_map<std::string, Quark::RequestMethod> Quark::HttpRequestValidator::methodMapping = {
   { "GET", RequestMethod::GET },
+  { "PATCH", RequestMethod::PATCH },
   { "POST", RequestMethod::POST },
   { "PUT", RequestMethod::PUT },
   { "DELETE", RequestMethod::DELETE },

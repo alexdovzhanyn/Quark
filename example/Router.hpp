@@ -8,8 +8,8 @@ public:
   static void registerRoutes() {
     Quark::Router::GET("/", ApplicationController::getRoot);
     Quark::Router::GET("/hello", ApplicationController::helloWorld);
+    Quark::Router::PATCH("/user/id", UserController::updateUser);
     Quark::Router::GET("/:userId/:friendId/relationship", ApplicationController::pathParamTest);
-
     Quark::Router::POST("/user/create", UserController::createUser);
   }
 };

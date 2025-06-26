@@ -4,6 +4,7 @@
 namespace Quark {
   enum RequestMethod {
     GET,
+    PATCH,
     POST,
     PUT,
     DELETE,

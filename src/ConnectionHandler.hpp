@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <string>
 #include <vector>
+#include <functional>
 
 using RequestMiddlewareHandler = std::function<void(Quark::HttpRequest&)>;
 using ResponseMiddlewareHandler = std::function<void(Quark::HttpResponse&)>;

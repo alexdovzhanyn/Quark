@@ -20,6 +20,8 @@ namespace Quark {
 
     static void GET(std::string route, RouteHandler handler); 
 
+    static void PATCH(std::string route, RouteHandler handler);
+
     static void POST(std::string route, RouteHandler handler); 
 
     static void PUT(std::string route, RouteHandler handler); 
