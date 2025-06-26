@@ -1,20 +1,33 @@
 #include "HttpRequestParser.hpp"
+#include "HttpException.hpp"
+#include "RouteNode.hpp"
 #include "HttpRequestValidator.hpp"
+#include <memory>
+#include <stdexcept>
 #include <string>
 #include <sys/socket.h>
 #include <unordered_set>
 #include <vector>
 
-bool Quark::HttpRequestParser::parseIncomingRequest() {
+bool Quark::HttpRequestParser::parseIncomingRequest(int timeout) {
   std::vector<char> buffer(RECV_BUFFER_SIZE);
   ssize_t packetSize;
 
   // Some clients seem to make extra empty dummy requests for some reason, which just immediately
   // open and close the connection. We don't want to bother logging those for now
-  bool isRealRequest = false;
-  while ((packetSize = recv(socketDescriptor, buffer.data(), buffer.size(), 0)) > 0) {
-    isRealRequest = true;
+  bool isRealRequest = false; 
 
+  std::chrono::time_point timeoutStart = std::chrono::high_resolution_clock::now();
+  while ((packetSize = recv(socketDescriptor, buffer.data(), buffer.size(), 0)) > 0) {
+    if (!request.requestStart.has_value()) {
+      request.requestStart = std::chrono::high_resolution_clock::now();
+    }
+
+    std::chrono::time_point timeNow = std::chrono::high_resolution_clock::now();
+    if (timeNow - timeoutStart  > std::chrono::seconds(timeout)) throw RequestTimeout();
+
+    isRealRequest = true;
+    
     rawRequest.insert(rawRequest.end(), buffer.begin(), buffer.begin() + packetSize);
 
     if (parserState == ParserState::PARSE_REQUEST_LINE) {
@@ -33,8 +46,11 @@ bool Quark::HttpRequestParser::parseIncomingRequest() {
 
     if (request.headers.find("Content-Length") == request.headers.end()) break;
 
-    // TODO: parse the body or something here
-    if (std::stoul(request.headers.at("Content-Length")) == rawRequest.size()) break;
+    if (std::stoul(request.headers.at("Content-Length")) == rawRequest.size()) {
+      request.rawBody.insert(request.rawBody.end(), rawRequest.begin(), rawRequest.end());
+      request.setBody(request.rawBody);
+      break;
+    }
   }
 
   return isRealRequest;
@@ -63,7 +79,7 @@ void Quark::HttpRequestParser::parseRequestLine() {
   request.protocolVersion = accumulateUntil('\r');
   HttpRequestValidator::validateProtocolVersion(request.protocolVersion);
   rawRequest.pop_front();
-
+  
   advanceParserState();
 }
 
@@ -94,6 +110,26 @@ void Quark::HttpRequestParser::parseQueryParams() {
 
     // In case we skipped past the end of the queryString by accident
     if (prevChar == ' ') break;
+  }
+}
+
+void Quark::HttpRequestParser::parsePathParams(Quark::HttpRequest &request, std::shared_ptr<Quark::RouteNode> matchedRoute) {
+  if (!matchedRoute) return;
+
+  std::shared_ptr<RouteNode> currNode = matchedRoute;
+  std::string curr;
+
+  for (int i = 1; i < request.path.length() && currNode; i++) {
+    if (request.path[i] != '/') curr += request.path[i];
+    
+    if (request.path[i] == '/' || i == request.path.length() - 1) {
+      if (currNode->isWildcard) {
+        request.pathParams[currNode->val.substr(1)] = curr;
+      }
+
+      currNode = currNode->next;
+      curr = "";
+    }
   }
 }
 

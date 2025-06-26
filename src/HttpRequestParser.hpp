@@ -1,6 +1,8 @@
 #pragma once
 #include "HttpRequest.hpp"
+#include "RouteNode.hpp"
 #include <deque>
+#include <memory>
 #include <unordered_set>
 
 namespace Quark {
@@ -15,7 +17,9 @@ namespace Quark {
   public:
     HttpRequestParser(int &sock, HttpRequest &req) : request(req), socketDescriptor(sock) {} 
 
-    bool parseIncomingRequest();
+    bool parseIncomingRequest(int timeout);
+    static void parsePathParams(HttpRequest &request, std::shared_ptr<RouteNode> matchedRoute);
+
   private:
     int RECV_BUFFER_SIZE = 8192;
     char prevChar;

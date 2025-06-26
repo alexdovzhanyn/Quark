@@ -7,12 +7,30 @@ namespace Quark {
   public:
     int statusCode;
 
-    HttpResponse() = default;
-    HttpResponse(int status, std::string message) : statusCode(status), statusMessage(message) {}
+    HttpResponse() {
+      addHeader("Connection", "close");
+    }
+
+    HttpResponse(int status, std::string message) : HttpResponse() {
+      statusCode = status;
+      statusMessage = message;
+    }
+
+    static HttpResponse ok(const std::string &body = "");
+    static HttpResponse notFound();
+    static HttpResponse internalServerError();
+    static HttpResponse sendFile(const std::string &filePath);
     
-    void setStatus(int status, std::string message = "");
-    void setBody(std::string bod);
-    void addHeader(const std::string &headerName, const std::string &headerValue);
+    HttpResponse& setStatus(int status, std::string message = "");
+    HttpResponse& setBody(std::string bod, bool updateContentLength = true);
+    HttpResponse& addHeader(const std::string &headerName, const std::string &headerValue);
+
+    template <typename T>
+    auto json(const T &obj) -> decltype(std::declval<T>().to_json(), std::declval<HttpResponse&>()) {
+      setBody(obj.to_json());
+      addHeader("Content-Type", "application/json");
+      return *this;
+    }
 
     std::string str();
   private:
