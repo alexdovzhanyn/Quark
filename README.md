@@ -9,6 +9,9 @@
 - Basic HTTP/1.1 request parsing
 - Support for common HTTP methods (GET, POST, etc.)
 - Custom routing via a lightweight router
+- Serving HTML and other file types from custom routes
+- Static file serving with MIME type resolution
+- Request + response middleware hooks
 - Thread-per-connection concurrency model
 - Graceful socket management
 - Modular design with support for controller-based route handling
@@ -39,10 +42,10 @@ make                # builds example_app into ../build/
 Inside your app, you can define routes like:
 
 ```cpp
-Quark::Router::GET("/hello", [](HttpRequest &req, HttpResponse &res) {
-  res.setStatus(200, "OK");
-  res.setBody("Hello, world!");
-  res.addHeader("Content-Type", "text/plain");
+Quark::Router::GET("/hello", [](Quark::HttpRequest &req) {
+  return Quark::HttpResponse::ok()
+    .setBody("Hello, world!")
+    .addHeader("Content-Type", "text/plain");
 });
 ```
 
@@ -52,7 +55,66 @@ or pass a reference to a static controller method:
 Quark::Router::GET("/hello", YourController::someStaticMethod);
 ```
 
+Your routes can also return files!
+
+```cpp
+Quark::Router::GET("/cat", [](Quark::HttpRequest &req) {
+  return Quark::HttpResponse::sendFile("path/to/kitty.png");
+});
+```
+
+or
+
+```cpp
+Quark::Router::GET("/home", [](Quark::HttpRequest &req) {
+  return Quark::HttpResponse::sendFile("public/index.html");
+})
+```
+
+Path parameters are also supported, by passing in a `:` followed by the path parameter name:
+
+```cpp
+Quark::ROUTER::GET("/:userId/details", [](Quark::HttpRequest &req) {
+  std::string userId = req.pathParams["userId"]; // will contain whatever userId was passed in the url
+  return Quark::HttpResponse::ok();
+})
+```
+
 ---
+
+## Static File Serving
+
+By default, Quark will serve static files from a `public/` directory contained
+in the root of your project. Requests to the server such as /img/cat.png
+will be routed to /public/img/cat.png if the file exists.
+
+Quark can also be configured to serve static files from a different directory, if needed:
+
+```cpp
+Quark::Server server = Quark::Server("9669");
+
+server.staticServe("images");
+```
+
+## Custom Middleware
+
+Often times, it is necessary to parse the body or augment a request / response. For this purpose,
+you can register middleware functions with the Quark server, which will run in the order they are
+defined.
+
+```cpp
+Quark::Server server = Quark::Server("9669");
+
+server
+  .registerRequestMiddleware([](Quark::HttpRequest& request) {
+    request.setBody("Overwritten body!");
+  })
+  .registerResponseMiddleware([](Quark::HttpResponse& response) {
+    response.addHeader("Access-Control-Allow-Origin", "*");
+  });
+
+server.run();
+```
 
 ## Tools and Requirements
 
@@ -63,9 +125,5 @@ Quark::Router::GET("/hello", YourController::someStaticMethod);
 
 ## Future Work
 
-- HTTP keep-alive support
 - TLS support (OpenSSL)
-- Middleware hooks (e.g., for logging or auth)
 - Streaming responses and chunked encoding
-- Static file serving with MIME type resolution
-
