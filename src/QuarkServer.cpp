@@ -1,4 +1,6 @@
 #include "QuarkServer.hpp"
+#include "HttpResponse.hpp"
+#include "QuarkRouter.hpp"
 
 unique_ptr<addrinfo, FreeAddrinfo> Quark::Server::getServerInfo() {
   addrinfo hints{};
@@ -52,6 +54,22 @@ Quark::Server::Server(string serverPort) : port(serverPort) {
   } 
 }
 
+void Quark::Server::staticServe(const std::string &path) {
+  Quark::Router::setStaticServePath(path);
+}
+
+Quark::Server& Quark::Server::registerRequestMiddleware(std::function<void(HttpRequest&)> middlewareHandler) {
+  requestMiddlewares.push_back(middlewareHandler);
+
+  return *this;
+}
+
+Quark::Server& Quark::Server::registerResponseMiddleware(std::function<void(HttpResponse&)> middlewareHandler) {
+  responseMiddlewares.push_back(middlewareHandler);
+
+  return *this;
+}
+
 void Quark::Server::run() {
   if (listen(socketDescriptor, 10) < 0) {
     cerr << "Failed to listen on port " << port << "! " << strerror(errno) << endl;
@@ -71,7 +89,12 @@ void Quark::Server::run() {
     int incomingSocketDescriptor = accept(socketDescriptor, reinterpret_cast<sockaddr*>(&incomingAddr), &addr_size);
 
     if (incomingSocketDescriptor > 0) {
-      shared_ptr<ConnectionHandler> handler = make_shared<ConnectionHandler>(incomingSocketDescriptor, incomingAddr);
+      shared_ptr<ConnectionHandler> handler = make_shared<ConnectionHandler>(
+        incomingSocketDescriptor,
+        incomingAddr,
+        requestMiddlewares,
+        responseMiddlewares
+      );
 
       thread handlerThread(&ConnectionHandler::handleHttpRequest, handler);
       handlerThread.detach();

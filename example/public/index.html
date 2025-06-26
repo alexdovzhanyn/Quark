@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Totoro the Cat's Home Page</title>
+    <style>
+      body {
+        background-color: #f0f0f0;
+        background-image: url("https://www.transparenttextures.com/patterns/graphy.png");
+        color: #0000cc;
+        font-family: "Comic Sans MS", "Courier New", monospace;
+        text-align: center;
+        margin: 0;
+        padding: 20px;
+      }
+      h1 {
+        color: #ff00ff;
+        text-shadow: 2px 2px #00ffff;
+      }
+      .container {
+        border: 5px double #0000cc;
+        padding: 20px;
+        background-color: #ffffff;
+        max-width: 600px;
+        margin: auto;
+      }
+      .kitty-pic {
+        border: 4px dashed #ff69b4;
+        width: 100%;
+        max-width: 400px;
+      }
+      .rainbow-text {
+        font-weight: bold;
+        font-size: 20px;
+        animation: rainbow 2s infinite linear;
+      }
+      @keyframes rainbow {
+        0% { color: red; }
+        20% { color: orange; }
+        40% { color: yellow; }
+        60% { color: green; }
+        80% { color: blue; }
+        100% { color: violet; }
+      }
+      .blink {
+        animation: blink 1s step-start infinite;
+      }
+      @keyframes blink {
+        50% { opacity: 0; }
+      }
+      hr {
+        border: 2px dotted #ff00ff;
+      }
+    </style>
+  </head>
+  <body>
+    <marquee behavior="alternate" scrollamount="10" bgcolor="#00ffff" style="color: red; font-weight: bold;">
+      Welcome to Totoro's Totally Radical Homepage!
+    </marquee>
+
+    <div class="container">
+      <h1>🐱 Meet Totoro the Cat 🐾</h1>
+      <img src="/img/kitty.jpg" alt="Totoro the Cat" class="kitty-pic" />
+      <p class="rainbow-text">Totoro loves naps, lasers, and tuna!</p>
+      <hr />
+      <p class="blink">Check back soon for more meowgical updates!</p>
+      <p><a href="mailto:Totoro@aol.com">✉️ Email Totoro</a></p>
+      <p><a href="#">🌐 Sign the Guestbook!</a></p>
+      <p><a href="#">📜 View Totoro's Cat Diary</a></p>
+    </div>
+
+    <marquee direction="right" scrollamount="8" style="margin-top: 20px;">
+      🌟🐾 Thanks for visiting! Come back soon! 🐾🌟
+    </marquee>
+  </body>
+</html>

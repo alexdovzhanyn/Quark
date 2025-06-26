@@ -30,4 +30,9 @@ namespace Quark {
   public:
     VersionNotSupported() : HttpException(501, "HTTP Version Not Supported") {}
   };
+
+  class RequestTimeout : public HttpException {
+  public:
+    RequestTimeout() : HttpException(408, "Request Timed Out") {}
+  };
 }
