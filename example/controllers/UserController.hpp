@@ -12,4 +12,13 @@ public:
       "age": 38
     })");
   }
+
+  static void updateUser(Quark::HttpRequest &request, Quark::HttpResponse &response) {
+    response.setStatus(200);
+    response.addHeader("Content-Type", "text/json");
+    response.setBody(R"({
+      "name": "Mike Wazowski",
+      "age": 38
+    })");
+  }
 };

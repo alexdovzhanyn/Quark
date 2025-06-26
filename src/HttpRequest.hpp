@@ -21,6 +21,7 @@ namespace Quark {
 
     RequestMethod getRequestMethod() {
       if (method == "GET") return RequestMethod::GET;
+      if (method == "PATCH") return RequestMethod::PATCH;
       if (method == "POST") return RequestMethod::POST;
       if (method == "DELETE") return RequestMethod::DELETE;
       if (method == "PUT") return RequestMethod::PUT;
